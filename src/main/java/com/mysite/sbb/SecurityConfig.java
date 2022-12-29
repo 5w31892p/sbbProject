@@ -23,13 +23,18 @@ public class SecurityConfig {
                 .csrf().ignoringRequestMatchers(
                         new AntPathRequestMatcher("/h2-console/**"))
                 .and()
-                .headers()
-                .addHeaderWriter(new XFrameOptionsHeaderWriter(
+                    .headers()
+                    .addHeaderWriter(new XFrameOptionsHeaderWriter(
                         XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 .and()
-                .formLogin()
-                .loginPage("/user/login")
-                .defaultSuccessUrl("/")
+                    .formLogin()
+                    .loginPage("/user/login")
+                    .defaultSuccessUrl("/")
+                .and()
+                    .logout()
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
         ;
 
         return http.build();
