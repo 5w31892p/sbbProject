@@ -20,41 +20,51 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class QuestionService {
 
-    private final QuestionRepository questionRepository;
+	private final QuestionRepository questionRepository;
 
-    public Page<Question> getList(int page) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createDate"));
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return this.questionRepository.findAll(pageable);
-    }
+	public Page<Question> getList(int page) {
+		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("createDate"));
+		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+		return this.questionRepository.findAll(pageable);
+	}
 
-    public Question getQuestion(Long id) {
-        Optional<Question> question = this.questionRepository.findById(id);
-        if (question.isPresent()) {
-            return question.get();
-        } else {
-            throw new DataNotFoundException("question not found");
-        }
-    }
+	public Question getQuestion(Long id) {
+		Optional<Question> question = this.questionRepository.findById(id);
+		if (question.isPresent()) {
+			return question.get();
+		} else {
+			throw new DataNotFoundException("question not found");
+		}
+	}
 
-    public void create(String subject, String content, SiteUser user) {
-        Question q = new Question();
-        q.setSubject(subject);
-        q.setContent(content);
-        q.setCreateDate(LocalDateTime.now());
-        q.setAuthor(user);
-        this.questionRepository.save(q);
-    }
+	public void create(String subject, String content, SiteUser user) {
+		Question q = new Question();
+		q.setSubject(subject);
+		q.setContent(content);
+		q.setCreateDate(LocalDateTime.now());
+		q.setAuthor(user);
+		this.questionRepository.save(q);
+	}
 
-    public void modify(Question question, String subject, String content) {
-        question.setSubject(subject);
-        question.setContent(content);
-        question.setModifyDate(LocalDateTime.now());
-        this.questionRepository.save(question);
-    }
+	public void modify(Question question, String subject, String content) {
+		question.setSubject(subject);
+		question.setContent(content);
+		question.setModifyDate(LocalDateTime.now());
+		this.questionRepository.save(question);
+	}
 
-    public void delete(Question question) {
-        this.questionRepository.delete(question);
-    }
+	public void delete(Question question) {
+		this.questionRepository.delete(question);
+	}
+
+	public void vote(Question question, SiteUser siteUser) {
+		if (!question.getVoter().contains(siteUser)) {
+			question.getVoter().add(siteUser);
+			this.questionRepository.save(question);
+		} else {
+			question.getVoter().remove(siteUser);
+			this.questionRepository.save(question);
+		}
+	}
 }
